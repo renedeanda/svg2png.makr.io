@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <clipPath id="rounded-corners">
+      <rect width="32" height="32" rx="6" ry="6"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#rounded-corners)">
+    <rect width="32" height="32" fill="#8B5CF6"/>
+    <!-- Purple background -->
+    <rect x="6" y="8" width="20" height="16" fill="none" stroke="white" stroke-width="2" rx="2" ry="2"/>
+    <!-- Photo frame -->
+    <circle cx="11" cy="13" r="2" fill="white"/>
+    <!-- Camera lens -->
+    <polygon points="6,24 14,16 20,22 26,16 26,24" fill="white"/>
+    <!-- Mountains/landscape -->
+  </g>
+</svg>

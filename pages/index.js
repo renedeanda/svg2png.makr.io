@@ -77,7 +77,7 @@ export default function Home() {
       <Head>
         <title>SVG2PNG | Instant SVG to PNG Conversion</title>
         <meta name="description" content="Transform your SVGs to PNGs with our free easy to use online converter." />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
       </Head>
 
       <header className="backdrop-blur-md bg-white/10 fixed w-full z-10">
