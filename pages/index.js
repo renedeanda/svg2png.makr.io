@@ -192,7 +192,7 @@ export default function Home() {
       <footer className="backdrop-blur-md bg-white/10 mt-12">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <p className="text-center text-indigo-200 text-sm">
-            © 2024 Crafted with 🧡 + 🤖 by the <Link href={"https://rede.io/?utm_source=svg2png"} className="underline" target="_blank">Rede team</Link>.
+            &copy; {new Date().getFullYear()} Crafted with 🧡 + 🤖 by the <Link href={"https://rede.io/?utm_source=svg2png"} className="underline" target="_blank">Rede team</Link>.
           </p>
         </div>
       </footer>
