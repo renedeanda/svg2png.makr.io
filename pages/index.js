@@ -27,6 +27,19 @@ export default function Home() {
     return () => document.removeEventListener('paste', handlePaste);
   }, []);
 
+  const extractSvgSize = (svgString) => {
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(svgString, 'image/svg+xml');
+      const svg = doc.querySelector('svg');
+      const width = parseInt(svg.getAttribute('width') || '0', 10);
+      const height = parseInt(svg.getAttribute('height') || '0', 10);
+      return { width, height };
+    } catch {
+      return { width: 0, height: 0 };
+    }
+  };
+
   const convertSvgToPng = async () => {
     if (!svgCode.trim().startsWith('<svg')) {
       setError('Please enter valid SVG code.');
@@ -38,24 +51,40 @@ export default function Home() {
     setIsConverting(true);
 
     try {
-      const svg = new Blob([svgCode], { type: 'image/svg+xml;charset=utf-8' });
+      // Clean up BOM or strange encoding
+      const cleanSvg = svgCode.replace(/^\uFEFF/, '');
+
+      const { width: fallbackW, height: fallbackH } = extractSvgSize(cleanSvg);
+
+      const svg = new Blob([cleanSvg], { type: 'image/svg+xml;charset=utf-8' });
       const url = URL.createObjectURL(svg);
       const img = new Image();
 
       img.onload = () => {
+        const w = img.naturalWidth || fallbackW || 1200;
+        const h = img.naturalHeight || fallbackH || 630;
+
         const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
+        canvas.width = w;
+        canvas.height = h;
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const pngUrl = canvas.toDataURL('image/png');
-        setPngUrl(pngUrl);
+        ctx.drawImage(img, 0, 0, w, h);
+        const pngData = canvas.toDataURL('image/png');
+        setPngUrl(pngData);
         URL.revokeObjectURL(url);
         setIsConverting(false);
       };
 
+      img.onerror = (e) => {
+        console.error('SVG failed to load', e);
+        setError('SVG failed to load. Ensure it’s valid XML and try again.');
+        setIsConverting(false);
+        URL.revokeObjectURL(url);
+      };
+
       img.src = url;
     } catch (err) {
+      console.error(err);
       setError('An error occurred during conversion. Please try again.');
       setIsConverting(false);
     }
@@ -76,7 +105,10 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 text-white">
       <Head>
         <title>SVG2PNG | Instant SVG to PNG Conversion</title>
-        <meta name="description" content="Transform your SVGs to PNGs with our free easy to use online converter." />
+        <meta
+          name="description"
+          content="Transform your SVGs to PNGs with our free easy to use online converter."
+        />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
       </Head>
 
@@ -87,7 +119,11 @@ export default function Home() {
               <span className="ml-2 text-xl font-bold">SVG2PNG</span>
             </div>
             <div className="flex items-center">
-              <a href="https://rede.io/?utm_source=svg2png" target="_blank" className="text-white hover:text-indigo-200 transition-colors">
+              <a
+                href="https://rede.io/?utm_source=svg2png"
+                target="_blank"
+                className="text-white hover:text-indigo-200 transition-colors"
+              >
                 <Globe className="h-6 w-6" />
               </a>
             </div>
@@ -106,7 +142,15 @@ export default function Home() {
             SVG to PNG Conversion
           </h1>
           <p className="text-xl text-indigo-200">
-            Lightning-fast SVG to PNG conversion made by the team behind the daily tech newsletter <Link href={"https://rede.io/?utm_source=svg2png"} className="underline" target="_blank">Rede.io</Link>.
+            Lightning-fast SVG to PNG conversion made by the team behind the daily tech newsletter{' '}
+            <Link
+              href="https://rede.io/?utm_source=svg2png"
+              className="underline"
+              target="_blank"
+            >
+              Rede.io
+            </Link>
+            .
           </p>
           <p className="text-xl text-indigo-200">
             Drag, drop, paste, or upload your SVG - we'll handle the rest.
@@ -173,7 +217,11 @@ export default function Home() {
                 <CheckCircle className="mr-2 text-green-400" />
                 Conversion Complete
               </h2>
-              <img src={pngUrl} alt="Converted PNG" className="max-w-full h-auto mb-4 rounded-xl shadow-lg" />
+              <img
+                src={pngUrl}
+                alt="Converted PNG"
+                className="max-w-full h-auto mb-4 rounded-xl shadow-lg"
+              />
               <motion.a
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -192,7 +240,11 @@ export default function Home() {
       <footer className="backdrop-blur-md bg-white/10 mt-12">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
           <p className="text-center text-indigo-200 text-sm">
-            &copy; {new Date().getFullYear()} Crafted with 🧡 + 🤖 by the <Link href={"https://rede.io/?utm_source=svg2png"} className="underline" target="_blank">Rede team</Link>.
+            &copy; {new Date().getFullYear()} Crafted with 🧡 + 🤖 by the{' '}
+            <Link href="https://rede.io/?utm_source=svg2png" className="underline" target="_blank">
+              Rede team
+            </Link>
+            .
           </p>
         </div>
       </footer>
